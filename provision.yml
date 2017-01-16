@@ -1,0 +1,47 @@
+- hosts: all
+  become: true
+  tasks:
+  - name: install packages
+    yum: name={{ item }} state=latest
+    with_items:
+      - postfix
+      - cyrus-sasl-plain
+      - mailx
+    notify: restart postfix service
+  - name: enable postfix service
+    service: enabled=yes name=postfix
+  - name: upload main postfix config
+    template:
+      src: files/main.cf.j2
+      dest: /etc/postfix/main.cf
+      owner: root
+      group: root
+      mode: 0644
+    notify: restart postfix service 
+  - name: upload sasl_passwd 
+    template:
+      src: files/sasl_passwd.j2
+      dest: /etc/postfix/sasl_passwd
+      owner: root
+      group: postfix
+      mode: 0640
+    notify: 
+    - postmap sasl_password
+    - restart postfix service
+  - name: upload generic map
+    template:
+      src: files/generic.j2
+      dest: /etc/postfix/generic
+      owner: root
+      group: root
+      mode: 0644
+    notify:
+    - postmap generic
+    - restart postfix service
+  handlers:
+  - name: restart postfix service
+    service: state=restarted name=postfix
+  - name: postmap sasl_password
+    shell: postmap /etc/postfix/sasl_passwd
+  - name: postmap generic
+    shell: postmap /etc/postfix/generic

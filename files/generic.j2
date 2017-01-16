@@ -1,0 +1,23 @@
+# EXAMPLE
+#        The  following  shows  a  generic  mapping with an indexed
+#        file.  When mail is sent to a remote host via  SMTP,  this
+#        replaces  his@localdomain.local  by  his ISP mail address,
+#        replaces her@localdomain.local by her  ISP  mail  address,
+#        and  replaces  other  local  addresses by his ISP account,
+#        with an address extension of +local (this example  assumes
+#        that the ISP supports "+" style address extensions).
+# 
+#        /etc/postfix/main.cf:
+#            smtp_generic_maps = hash:/etc/postfix/generic
+# 
+#        /etc/postfix/generic:
+#            his@localdomain.local   hisaccount@hisisp.example
+#            her@localdomain.local   heraccount@herisp.example
+#            @localdomain.local      hisaccount+local@hisisp.example
+# 
+#        Execute  the  command "postmap /etc/postfix/generic" when-
+#        ever the table is changed.  Instead of hash, some  systems
+#        use  dbm database files. To find out what tables your sys-
+#        tem supports use the command "postconf -m".
+@{{ hostname }}   {{ email_address }}
+
